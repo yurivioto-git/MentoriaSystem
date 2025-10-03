@@ -1,0 +1,18 @@
+{
+    "name": "etec-jales/mentoria-system",
+    "description": "Sistema de Controle de Horas de Mentoria para a Etec Jales.",
+    "type": "project",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Seu Nome",
+            "email": "seu-email@example.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "require": {}
+}
