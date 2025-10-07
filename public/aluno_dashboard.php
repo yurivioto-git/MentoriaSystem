@@ -8,6 +8,7 @@ if (is_admin()) {
 }
 
 use App\Models\Hora;
+use App\Models\Apendice5;
 use App\Controllers\HorasController;
 
 $horaModel = new Hora();
@@ -43,6 +44,56 @@ $totalHoras = array_reduce($minhasHoras, fn($sum, $h) => $sum + $h['quantidade_h
 $tiposPermitidos = ['Palestras', 'Visitas Técnicas', 'Mentoria', 'Eventos Científicos', 'Outros'];
 
 ?>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Apêndice 5</h3>
+        <a href="enviar_apendice5.php" class="btn btn-primary mb-3">Enviar Apêndice 5</a>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Bimestre</th>
+                        <th>Data de Envio</th>
+                        <th>Status</th>
+                        <th>Observações do Admin</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $apendice5Model = new Apendice5();
+                    $apendice5Submissions = $apendice5Model->findByUserId($userId);
+                    if (empty($apendice5Submissions)):
+                    ?>
+                        <tr><td colspan="5" class="text-center">Nenhum envio de Apêndice 5 encontrado.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($apendice5Submissions as $submission): ?>
+                            <tr>
+                                <td><?php echo e($submission['bimestre_ref']); ?></td>
+                                <td><?php echo date('d/m/Y H:i', strtotime($submission['submission_date'])); ?></td>
+                                <td>
+                                    <span class="badge bg-<?php echo strtolower($submission['status']) === 'aprovado' ? 'success' : (strtolower($submission['status']) === 'rejeitado' ? 'danger' : 'warning'); ?>">
+                                        <?php echo e($submission['status']); ?>
+                                    </span>
+                                </td>
+                                <td><?php echo e($submission['admin_notes'] ?? ''); ?></td>
+                                <td>
+                                    <a href="download_apendice5.php?id=<?php echo $submission['id']; ?>" class="btn btn-info btn-sm">Baixar</a>
+                                    <form action="delete_apendice5.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este envio?');" style="display:inline;">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                        <input type="hidden" name="id" value="<?php echo $submission['id']; ?>">
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Excluir">Excluir</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <!-- Coluna para Lançar Horas -->

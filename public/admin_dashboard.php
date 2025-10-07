@@ -6,6 +6,7 @@ use App\Controllers\AdminController;
 use App\Controllers\HorasController;
 use App\Models\User;
 use App\Models\Hora;
+use App\Models\Apendice5;
 
 // Primeiro, verificar se é uma ação de geração de relatório
 if (isset($_GET['action']) && $_GET['action'] === 'generate_report') {
@@ -64,6 +65,7 @@ include_once PROJECT_ROOT . '/src/Views/header.php';
         <a class="nav-link <?php echo ($view === 'horas') ? 'active' : ''; ?>" href="?view=horas">Gerenciar Horas</a>
         <a class="nav-link <?php echo ($view === 'lancar') ? 'active' : ''; ?>" href="?view=lancar">Lançar Horas</a>
         <a class="nav-link <?php echo ($view === 'relatorios') ? 'active' : ''; ?>" href="?view=relatorios">Relatórios</a>
+        <a class="nav-link <?php echo ($view === 'apendice5') ? 'active' : ''; ?>" href="?view=apendice5">Gerenciar Apêndice 5</a>
     </div>
 
     <div class="tab-content flex-grow-1" id="v-pills-tabContent">
@@ -105,6 +107,18 @@ include_once PROJECT_ROOT . '/src/Views/header.php';
         <!-- Visão de Relatórios -->
         <div class="tab-pane fade <?php echo ($view === 'relatorios') ? 'show active' : ''; ?>">
             <?php include PROJECT_ROOT . '/src/Views/admin/reports.php'; ?>
+        </div>
+
+        <!-- Visão de Gerenciar Apêndice 5 -->
+        <div class="tab-pane fade <?php echo ($view === 'apendice5') ? 'show active' : ''; ?>">
+            <?php
+            $filter_bimestre_ap5 = $_GET['bimestre_ap5'] ?? null;
+            $filter_status_ap5 = $_GET['status_ap5'] ?? null;
+            $apendice5Model = new Apendice5();
+            $submissions = $apendice5Model->getSubmissions($filter_bimestre_ap5, $filter_status_ap5);
+            $distinctBimestres = $apendice5Model->getDistinctBimestres();
+            include PROJECT_ROOT . '/src/Views/admin/manage_apendice5.php';
+            ?>
         </div>
     </div>
 </div>
