@@ -62,8 +62,8 @@
                         <form action="validate_apendice5.php" method="post" style="display: inline-block;">
                             <input type="hidden" name="id" value="<?= $submission['id'] ?>">
                             <select name="status" class="form-control-sm">
-                                <option value="aprovado">Aprovar</option>
                                 <option value="rejeitado">Rejeitar</option>
+                                <option value="aprovado">Aprovar</option>
                             </select>
                             <input type="text" name="admin_notes" placeholder="Observações" class="form-control-sm">
                             <button type="submit" class="btn btn-primary btn-sm">Salvar</button>

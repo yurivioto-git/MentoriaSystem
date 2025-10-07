@@ -26,8 +26,8 @@ require_once __DIR__ . '../../header.php';
             </select>
         </div>
         <div class="form-group">
-            <label for="apendice5_file">Selecione o arquivo (.docx):</label>
-            <input type="file" class="form-control-file" id="apendice5_file" name="apendice5_file" accept=".docx" required>
+            <label for="apendice5_file">Selecione o arquivo (.doc, .docx):</label>
+            <input type="file" class="form-control-file" id="apendice5_file" name="apendice5_file" accept=".doc,.docx" required>
         </div>
         <button type="submit" class="btn btn-primary">Enviar</button>
     </form>

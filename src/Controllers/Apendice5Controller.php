@@ -34,7 +34,7 @@ class Apendice5Controller
             // Validate file extension
             $fileNameCmps = explode(".", $fileName);
             $fileExtension = strtolower(end($fileNameCmps));
-            $allowedExtensions = ['docx'];
+            $allowedExtensions = ['doc', 'docx'];
             if (!in_array($fileExtension, $allowedExtensions)) {
                 header('Location: aluno_dashboard.php?error=invalid_file_type');
                 exit();

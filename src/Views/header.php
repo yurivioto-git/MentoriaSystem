@@ -72,13 +72,30 @@ if (!defined('PROJECT_ROOT')) {
 <main class="container">
     <?php
     // Exibe mensagens de erro ou sucesso passadas via GET
-    if (isset($_GET['error'])):
-    ?>
-        <div class="alert alert-danger" role="alert">
-            <?php echo e(urldecode($_GET['error'])); ?>
-        </div>
-    <?php endif; ?>
-    <?php if (isset($_GET['success'])):
+    if (isset($_GET['error'])) {
+        $errorMessage = '';
+        switch ($_GET['error']) {
+            case 'invalid_file_type':
+                $errorMessage = 'Tipo de Arquivo Inválido! Aceito somente os tipos DOC e DOCX.';
+                break;
+            case 'submission_exists':
+                $errorMessage = 'Você já enviou o Apêndice 5 para este bimestre.';
+                break;
+            case 'upload_failed':
+                $errorMessage = 'Ocorreu um erro ao enviar o arquivo. Tente novamente.';
+                break;
+            case 'upload_error':
+                $errorMessage = 'Ocorreu um erro no upload. Tente novamente.';
+                break;
+            default:
+                $errorMessage = urldecode($_GET['error']);
+                break;
+        }
+        if ($errorMessage) {
+            echo '<div class="alert alert-danger" role="alert">' . htmlspecialchars($errorMessage) . '</div>';
+        }
+    }
+    if (isset($_GET['success'])):
         $successMessages = [
             'registered' => 'Cadastro realizado com sucesso! Faça o login.',
             'logout' => 'Você saiu do sistema.'
