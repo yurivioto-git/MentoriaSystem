@@ -147,6 +147,11 @@ class HorasController
             $this->redirectWithError('Você não tem permissão para excluir este lançamento.');
         }
 
+        // Alunos não podem deletar se já foi aprovado
+        if (!is_admin() && $hora['status'] === 'Aprovado') {
+            $this->redirectWithError('Você não pode excluir um lançamento que já foi aprovado.');
+        }
+
         try {
             $this->horaModel->delete($id);
             $this->redirectWithSuccess('Lançamento excluído com sucesso.');
@@ -157,14 +162,14 @@ class HorasController
 
     private function redirectWithError(string $message): void
     {
-        $redirectUrl = is_admin() ? '/public/admin_dashboard.php' : '/public/aluno_dashboard.php';
+        $redirectUrl = is_admin() ? 'admin_dashboard.php' : 'aluno_dashboard.php';
         header("Location: {$redirectUrl}?error=" . urlencode($message));
         exit();
     }
 
     private function redirectWithSuccess(string $message): void
     {
-        $redirectUrl = is_admin() ? '/public/admin_dashboard.php' : '/public/aluno_dashboard.php';
+        $redirectUrl = is_admin() ? 'admin_dashboard.php' : 'aluno_dashboard.php';
         header("Location: {$redirectUrl}?success=" . urlencode($message));
         exit();
     }

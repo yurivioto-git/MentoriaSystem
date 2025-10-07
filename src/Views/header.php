@@ -75,6 +75,9 @@ if (!defined('PROJECT_ROOT')) {
     if (isset($_GET['error'])) {
         $errorMessage = '';
         switch ($_GET['error']) {
+            case 'cannot_delete_approved':
+                $errorMessage = 'Você não pode excluir um envio que já foi aprovado.';
+                break;
             case 'invalid_file_type':
                 $errorMessage = 'Tipo de Arquivo Inválido! Aceito somente os tipos DOC e DOCX.';
                 break;

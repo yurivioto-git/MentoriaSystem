@@ -138,10 +138,18 @@ class Apendice5Controller
 
         $submissionId = (int)$_POST['id'];
         $userId = $_SESSION['user_id'];
+        $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
 
         $submission = Apendice5::findById($submissionId);
 
-        if (!$submission || $submission['user_id'] != $userId) {
+        // Alunos não podem deletar se já foi aprovado
+        if (!$isAdmin && $submission && $submission['status'] === 'aprovado') {
+            header('Location: aluno_dashboard.php?error=' . urlencode('Você não pode excluir um envio que já foi aprovado.'));
+            exit();
+        }
+
+        // Checa se o usuário é dono do arquivo, a não ser que seja admin
+        if (!$submission || (!$isAdmin && $submission['user_id'] != $userId)) {
             // Not found or not owner
             header('Location: aluno_dashboard.php?error=permission_denied');
             exit();
@@ -149,7 +157,12 @@ class Apendice5Controller
 
         Apendice5::delete($submissionId);
 
-        header('Location: aluno_dashboard.php?success=delete_success');
+        // Redireciona para o painel correto
+        if ($isAdmin) {
+            header('Location: admin_dashboard.php?view=apendice5&success=delete_success');
+        } else {
+            header('Location: aluno_dashboard.php?success=delete_success');
+        }
         exit();
     }
 
