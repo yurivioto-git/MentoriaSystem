@@ -81,10 +81,9 @@ if (!defined('PROJECT_ROOT')) {
             case 'invalid_file_type':
                 $errorMessage = 'Tipo de Arquivo Inválido! Aceito somente os tipos DOC e DOCX.';
                 break;
-            case 'submission_exists':
-                $errorMessage = 'Você já enviou o Apêndice 5 para este bimestre.';
-                break;
-            case 'upload_failed':
+        case 'submission_exists':
+            $errorMessage = 'Apendice já enviado para o Bimestre selecionado';
+            break;            case 'upload_failed':
                 $errorMessage = 'Ocorreu um erro ao enviar o arquivo. Tente novamente.';
                 break;
             case 'upload_error':

@@ -28,12 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageTitle = 'Dashboard do Aluno';
 include_once PROJECT_ROOT . '/src/Views/header.php';
 
-if (isset($_GET['error'])) {
-    echo '<div class="container mt-3"><div class="alert alert-danger">' . htmlspecialchars(urldecode($_GET['error'])) . '</div></div>';
-}
-if (isset($_GET['success'])) {
-    echo '<div class="container mt-3"><div class="alert alert-success">' . htmlspecialchars(urldecode($_GET['success'])) . '</div></div>';
-}
+
 
 $userId = $_SESSION['user_id'];
 

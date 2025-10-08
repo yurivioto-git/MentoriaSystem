@@ -147,8 +147,8 @@ class HorasController
             $this->redirectWithError('Você não tem permissão para excluir este lançamento.');
         }
 
-        // Alunos não podem deletar se já foi aprovado
-        if (!is_admin() && $hora['status'] === 'Aprovado') {
+        // Não permite deletar se já foi aprovado
+        if ($hora['status'] === 'Aprovado') {
             $this->redirectWithError('Você não pode excluir um lançamento que já foi aprovado.');
         }
 
