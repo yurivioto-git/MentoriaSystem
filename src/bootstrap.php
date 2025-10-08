@@ -68,9 +68,19 @@ function is_logged_in(): bool
     return isset($_SESSION['user_id']);
 }
 
-function is_admin(): bool
+function is_super_admin(): bool
 {
     return is_logged_in() && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+}
+
+function is_coordinator(): bool
+{
+    return is_logged_in() && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'coordinator';
+}
+
+function is_admin(): bool
+{
+    return is_super_admin() || is_coordinator();
 }
 
 function require_auth(): void
@@ -84,7 +94,15 @@ function require_auth(): void
 function require_admin(): void
 {
     if (!is_admin()) {
-        header('Location: /dashboard.php?error=admin_required');
+        header('Location: /login.php?error=admin_required');
+        exit();
+    }
+}
+
+function require_coordinator(): void
+{
+    if (!is_coordinator()) {
+        header('Location: /dashboard.php?error=coordinator_required');
         exit();
     }
 }

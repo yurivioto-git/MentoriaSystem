@@ -7,6 +7,7 @@ use App\Controllers\HorasController;
 use App\Models\User;
 use App\Models\Hora;
 use App\Models\Apendice5;
+use App\Models\Course;
 
 // Primeiro, verificar se é uma ação de geração de relatório
 if (isset($_GET['action']) && $_GET['action'] === 'generate_report') {
@@ -26,11 +27,14 @@ $adminController = new AdminController();
 $horasController = new HorasController();
 $userModel = new User();
 $horaModel = new Hora();
+$courseModel = new Course();
 
 // Roteamento de ações POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_GET['action'] ?? '';
-    if (str_starts_with($action, 'user')) {
+    $user_actions = ['create_user', 'update_user', 'delete_user', 'update_hora_status'];
+
+    if (in_array($action, $user_actions)) {
         $adminController->handleAction();
     } else {
         // Ações de horas (criar, editar, deletar)
@@ -44,12 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'delete_hora':
                 $horasController->delete((int)$_POST['hora_id']);
                 break;
-            case 'update_hora_status':
-                $adminController->handleAction();
-                break;
         }
     }
-    exit();
 }
 
 // Roteamento de views GET
@@ -62,6 +62,9 @@ include_once PROJECT_ROOT . '/src/Views/header.php';
 <div class="d-flex align-items-start">
     <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
         <a class="nav-link <?php echo ($view === 'alunos') ? 'active' : ''; ?>" href="?view=alunos">Gerenciar Alunos</a>
+        <?php if (is_super_admin()): ?>
+        <a class="nav-link <?php echo ($view === 'coordinators') ? 'active' : ''; ?>" href="?view=coordinators">Gerenciar Coordenadores</a>
+        <?php endif; ?>
         <a class="nav-link <?php echo ($view === 'horas') ? 'active' : ''; ?>" href="?view=horas">Gerenciar Horas</a>
         <a class="nav-link <?php echo ($view === 'lancar') ? 'active' : ''; ?>" href="?view=lancar">Lançar Horas</a>
         <a class="nav-link <?php echo ($view === 'relatorios') ? 'active' : ''; ?>" href="?view=relatorios">Relatórios</a>
@@ -72,15 +75,44 @@ include_once PROJECT_ROOT . '/src/Views/header.php';
         <!-- Visão de Gerenciar Alunos -->
         <div class="tab-pane fade <?php echo ($view === 'alunos') ? 'show active' : ''; ?>">
             <?php 
-            $alunos = $userModel->getAll('aluno');
+            $courses = $courseModel->getAll();
+            $user = new \App\Models\User();
+            $current_user = $user->findById($_SESSION['user_id']);
+            $selected_course = $_GET['course_id'] ?? null;
+
+            if (is_super_admin()) {
+                $alunos = $userModel->getAll('student', null, $selected_course);
+            } else {
+                $alunos = $userModel->getAll('student', null, $current_user['course_id']);
+            }
+            
             include PROJECT_ROOT . '/src/Views/admin/manage_users.php'; 
             ?>
         </div>
 
+        <!-- Visão de Gerenciar Coordenadores -->
+        <?php if (is_super_admin()): ?>
+        <div class="tab-pane fade <?php echo ($view === 'coordinators') ? 'show active' : ''; ?>">
+            <?php 
+            $coordinators = $userModel->getAll('coordinator');
+            $courses = $courseModel->getAll();
+            include PROJECT_ROOT . '/src/Views/admin/manage_coordinators.php'; 
+            ?>
+        </div>
+        <?php endif; ?>
+
         <!-- Visão de Gerenciar Horas -->
         <div class="tab-pane fade <?php echo ($view === 'horas') ? 'show active' : ''; ?>">
             <?php
-            $alunos = $userModel->getAll('aluno');
+            $user = new \App\Models\User();
+            $current_user = $user->findById($_SESSION['user_id']);
+
+            if (is_super_admin()) {
+                $alunos = $userModel->getAll('student');
+            } else {
+                $alunos = $userModel->getAll('student', null, $current_user['course_id']);
+            }
+
             $filters = [
                 'aluno_id' => $_GET['aluno_id'] ?? null,
                 'tipo' => $_GET['tipo'] ?? null,
@@ -99,7 +131,15 @@ include_once PROJECT_ROOT . '/src/Views/header.php';
         <!-- Visão de Lançar Horas (para um aluno) -->
         <div class="tab-pane fade <?php echo ($view === 'lancar') ? 'show active' : ''; ?>">
             <?php 
-            $alunos = $userModel->getAll('aluno', true);
+            $user = new \App\Models\User();
+            $current_user = $user->findById($_SESSION['user_id']);
+
+            if (is_super_admin()) {
+                $alunos = $userModel->getAll('student', true);
+            } else {
+                $alunos = $userModel->getAll('student', true, $current_user['course_id']);
+            }
+            
             include PROJECT_ROOT . '/src/Views/admin/lancar_horas.php'; 
             ?>
         </div>

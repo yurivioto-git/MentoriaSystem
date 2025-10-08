@@ -100,7 +100,7 @@ class Apendice5Controller
 
     public function validate()
     {
-        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+        if (!is_admin()) {
             header('Location: login.php');
             exit();
         }
@@ -117,7 +117,7 @@ class Apendice5Controller
 
     public function manage()
     {
-        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+        if (!is_admin()) {
             header('Location: login.php');
             exit();
         }
@@ -138,7 +138,7 @@ class Apendice5Controller
 
         $submissionId = (int)$_POST['id'];
         $userId = $_SESSION['user_id'];
-        $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+        $isAdmin = is_admin();
 
         $submission = Apendice5::findById($submissionId);
 
@@ -172,7 +172,7 @@ class Apendice5Controller
             die('A extensão ZIP do PHP não está habilitada. Por favor, habilite-a no seu arquivo php.ini.');
         }
 
-        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+        if (!is_admin()) {
             header('Location: login.php');
             exit();
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Models\Course;
 use App\Models\User;
 
 class AuthController
@@ -59,9 +60,11 @@ class AuthController
         $_SESSION['user_rm'] = $user['rm'];
         $_SESSION['user_nome'] = $user['nome'];
         $_SESSION['user_role'] = $user['role'];
+        $_SESSION['user_course_id'] = $user['course_id'];
+        $_SESSION['is_superadmin'] = $user['is_superadmin'];
 
         // Redireciona para o dashboard apropriado
-        if ($user['role'] === 'admin') {
+        if ($user['role'] === 'admin' || $user['role'] === 'coordinator') {
             header('Location: admin_dashboard.php');
         } else {
             header('Location: aluno_dashboard.php');
@@ -71,6 +74,8 @@ class AuthController
 
     public function showRegistrationForm(string $error = null): void
     {
+        $courseModel = new Course();
+        $courses = $courseModel->getAll();
         require_once PROJECT_ROOT . '/src/Views/register_form.php';
     }
 
@@ -88,10 +93,11 @@ class AuthController
         $nome = $_POST['nome'] ?? '';
         $rm = $_POST['rm'] ?? '';
         $serie = (int)($_POST['serie'] ?? 0);
+        $course_id = (int)($_POST['course_id'] ?? 0);
         $senha = $_POST['senha'] ?? '';
         $senha_confirm = $_POST['senha_confirm'] ?? '';
 
-        if (empty($nome) || empty($rm) || empty($serie) || empty($senha)) {
+        if (empty($nome) || empty($rm) || empty($serie) || empty($senha) || empty($course_id)) {
             $this->showRegistrationForm('Todos os campos são obrigatórios.');
             return;
         }
@@ -112,7 +118,7 @@ class AuthController
         }
 
         try {
-            $this->userModel->create($nome, $rm, $serie, $senha);
+            $this->userModel->create($nome, $rm, $serie, $senha, $course_id);
             header('Location: login.php?success=registered');
             exit();
         } catch (\Exception $e) {

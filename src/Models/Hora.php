@@ -103,6 +103,10 @@ class Hora
             $conditions[] = "h.status = :status";
             $params[':status'] = $filters['status'];
         }
+        if (!empty($filters['course_id'])) {
+            $conditions[] = "u.course_id = :course_id";
+            $params[':course_id'] = $filters['course_id'];
+        }
 
         if (!empty($conditions)) {
             $sql .= " WHERE " . implode(' AND ', $conditions);

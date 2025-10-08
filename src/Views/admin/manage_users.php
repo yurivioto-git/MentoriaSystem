@@ -1,5 +1,26 @@
 <h3>Gerenciar Alunos</h3>
 
+<?php if (is_super_admin()): ?>
+<div class="row mb-3">
+    <div class="col-md-4">
+        <form action="" method="GET">
+            <input type="hidden" name="view" value="alunos">
+            <div class="input-group">
+                <select name="course_id" class="form-select">
+                    <option value="">Todos os Cursos</option>
+                    <?php foreach ($courses as $course): ?>
+                        <option value="<?php echo $course['id']; ?>" <?php echo (isset($_GET['course_id']) && $_GET['course_id'] == $course['id']) ? 'selected' : ''; ?>>
+                            <?php echo e($course['name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <button class="btn btn-primary" type="submit">Filtrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+<?php endif; ?>
+
 <!-- Botão para abrir modal de novo aluno -->
 <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createUserModal">
     <i class="bi bi-plus-circle"></i> Novo Aluno
@@ -12,6 +33,7 @@
                 <th>Nome</th>
                 <th>RM</th>
                 <th>Série</th>
+                <th>Curso</th>
                 <th>Status</th>
                 <th>Ações</th>
             </tr>
@@ -22,6 +44,7 @@
                     <td><?php echo e($aluno['nome']); ?></td>
                     <td><?php echo e($aluno['rm']); ?></td>
                     <td><?php echo e($aluno['serie']); ?>ª</td>
+                    <td><?php echo e($aluno['course_name']); ?></td>
                     <td>
                         <span class="badge bg-<?php echo $aluno['active'] ? 'success' : 'secondary'; ?>">
                             <?php echo $aluno['active'] ? 'Ativo' : 'Inativo'; ?>
@@ -70,6 +93,18 @@
                                             <option value="3" <?php echo ($aluno['serie'] == 3) ? 'selected' : ''; ?>>3ª</option>
                                         </select>
                                     </div>
+                                    <?php if (is_super_admin()): ?>
+                                    <div class="mb-3">
+                                        <label class="form-label">Curso</label>
+                                        <select name="course_id" class="form-select" required>
+                                            <?php foreach ($courses as $course): ?>
+                                                <option value="<?php echo $course['id']; ?>" <?php echo ($aluno['course_id'] == $course['id']) ? 'selected' : ''; ?>>
+                                                    <?php echo e($course['name']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <?php endif; ?>
                                     <div class="mb-3">
                                         <label class="form-label">Nova Senha (deixe em branco para não alterar)</label>
                                         <input type="password" name="senha" class="form-control">
@@ -103,7 +138,7 @@
             <form action="?view=alunos&action=create_user" method="POST">
                 <div class="modal-body">
                     <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                    <input type="hidden" name="role" value="aluno">
+                    <input type="hidden" name="role" value="student">
 
                     <div class="mb-3">
                         <label class="form-label">Nome Completo</label>
@@ -122,6 +157,17 @@
                             <option value="3">3ª</option>
                         </select>
                     </div>
+                    <?php if (is_super_admin()): ?>
+                    <div class="mb-3">
+                        <label class="form-label">Curso</label>
+                        <select name="course_id" class="form-select" required>
+                            <option value="">Selecione...</option>
+                            <?php foreach ($courses as $course): ?>
+                                <option value="<?php echo $course['id']; ?>"><?php echo e($course['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php endif; ?>
                     <div class="mb-3">
                         <label class="form-label">Senha</label>
                         <input type="password" name="senha" class="form-control" required>

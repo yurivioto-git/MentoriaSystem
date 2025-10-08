@@ -32,13 +32,13 @@ class User
         return $user ?: null;
     }
 
-    public function create(string $nome, string $rm, int $serie, string $senha): int
+    public function create(string $nome, string $rm, int $serie, string $senha, ?int $course_id, string $role = 'student'): int
     {
         $senha_hash = password_hash($senha, PASSWORD_BCRYPT);
         $ano_ingresso = date('Y');
 
         $stmt = $this->db->prepare(
-            "INSERT INTO users (nome, rm, serie, senha_hash, ano_ingresso, role) VALUES (:nome, :rm, :serie, :senha_hash, :ano_ingresso, 'aluno')"
+            "INSERT INTO users (nome, rm, serie, senha_hash, ano_ingresso, role, course_id) VALUES (:nome, :rm, :serie, :senha_hash, :ano_ingresso, :role, :course_id)"
         );
 
         $stmt->execute([
@@ -46,32 +46,40 @@ class User
             ':rm' => $rm,
             ':serie' => $serie,
             ':senha_hash' => $senha_hash,
-            ':ano_ingresso' => $ano_ingresso
+            ':ano_ingresso' => $ano_ingresso,
+            ':role' => $role,
+            ':course_id' => $course_id
         ]);
 
         return (int)$this->db->lastInsertId();
     }
     
-    public function getAll(string $role = null, bool $active = null): array
+    public function getAll(string $role = null, bool $active = null, ?int $course_id = null): array
     {
-        $sql = "SELECT id, nome, rm, serie, role, active, ano_ingresso FROM users";
+        $sql = "SELECT u.id, u.nome, u.rm, u.serie, u.role, u.active, u.ano_ingresso, u.course_id, c.name as course_name 
+                FROM users u
+                LEFT JOIN courses c ON u.course_id = c.id";
         $conditions = [];
         $params = [];
 
         if ($role !== null) {
-            $conditions[] = "role = :role";
+            $conditions[] = "u.role = :role";
             $params[':role'] = $role;
         }
         if ($active !== null) {
-            $conditions[] = "active = :active";
+            $conditions[] = "u.active = :active";
             $params[':active'] = $active;
+        }
+        if ($course_id !== null) {
+            $conditions[] = "u.course_id = :course_id";
+            $params[':course_id'] = $course_id;
         }
 
         if (!empty($conditions)) {
             $sql .= " WHERE " . implode(' AND ', $conditions);
         }
         
-        $sql .= " ORDER BY nome ASC";
+        $sql .= " ORDER BY u.nome ASC";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
@@ -81,7 +89,7 @@ class User
     public function update(int $id, array $data): bool
     {
         // Campos permitidos para atualização
-        $allowedFields = ['nome', 'rm', 'serie', 'role', 'active'];
+        $allowedFields = ['nome', 'rm', 'serie', 'role', 'active', 'course_id'];
         $setClauses = [];
         $params = ['id' => $id];
 

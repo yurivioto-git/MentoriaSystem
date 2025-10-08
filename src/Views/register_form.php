@@ -33,6 +33,18 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="course_id" class="form-label">Curso</label>
+                        <select class="form-select" id="course_id" name="course_id" required>
+                            <option value="">Selecione seu curso</option>
+                            <?php if (!empty($courses)): ?>
+                                <?php foreach ($courses as $course): ?>
+                                    <option value="<?php echo e($course['id']); ?>"><?php echo e($course['name']); ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="senha" class="form-label">Senha</label>
                         <input type="password" class="form-control" id="senha" name="senha" required>
                     </div>
