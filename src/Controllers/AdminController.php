@@ -44,7 +44,43 @@ class AdminController
                 case 'update_hora_status':
                     $this->updateHoraStatus();
                     break;
+                case 'update_password':
+                    $this->updatePassword();
+                    break;
             }
+        }
+    }
+
+    private function updatePassword(): void
+    {
+        if (!is_admin()) {
+            $this->redirectWithError('Você não tem permissão para alterar a senha.');
+        }
+
+        $userId = $_SESSION['user_id'];
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+            $this->redirectWithError('Todos os campos são obrigatórios.');
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            $this->redirectWithError('A nova senha e a confirmação não correspondem.');
+        }
+
+        $user = $this->userModel->findById($userId);
+
+        if (!$user || !password_verify($currentPassword, $user['senha_hash'])) {
+            $this->redirectWithError('A senha atual está incorreta.');
+        }
+
+        try {
+            $this->userModel->update($userId, ['senha' => $newPassword]);
+            $this->redirectWithSuccess('Senha alterada com sucesso.');
+        } catch (\Exception $e) {
+            $this->redirectWithError('Erro ao alterar a senha: ' . $e->getMessage());
         }
     }
 

@@ -32,7 +32,7 @@ $courseModel = new Course();
 // Roteamento de ações POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_GET['action'] ?? '';
-    $user_actions = ['create_user', 'update_user', 'delete_user', 'update_hora_status'];
+    $user_actions = ['create_user', 'update_user', 'delete_user', 'update_hora_status', 'update_password'];
 
     if (in_array($action, $user_actions)) {
         $adminController->handleAction();
@@ -69,6 +69,7 @@ include_once PROJECT_ROOT . '/src/Views/header.php';
         <a class="nav-link <?php echo ($view === 'lancar') ? 'active' : ''; ?>" href="?view=lancar">Lançar Horas</a>
         <a class="nav-link <?php echo ($view === 'relatorios') ? 'active' : ''; ?>" href="?view=relatorios">Relatórios</a>
         <a class="nav-link <?php echo ($view === 'apendice5') ? 'active' : ''; ?>" href="?view=apendice5">Gerenciar Apêndice 5</a>
+        <a class="nav-link <?php echo ($view === 'change_password') ? 'active' : ''; ?>" href="?view=change_password">Alterar Senha</a>
     </div>
 
     <div class="tab-content flex-grow-1" id="v-pills-tabContent">
@@ -123,6 +124,12 @@ include_once PROJECT_ROOT . '/src/Views/header.php';
             ];
             // Remove filtros vazios
             $filters = array_filter($filters);
+
+            // Adiciona filtro de curso para coordenadores
+            if (!is_super_admin()) {
+                $filters['course_id'] = $current_user['course_id'];
+            }
+
             $horas = $horaModel->findAllWithDetails($filters);
             include PROJECT_ROOT . '/src/Views/admin/manage_horas.php';
             ?>
@@ -159,6 +166,11 @@ include_once PROJECT_ROOT . '/src/Views/header.php';
             $distinctBimestres = $apendice5Model->getDistinctBimestres();
             include PROJECT_ROOT . '/src/Views/admin/manage_apendice5.php';
             ?>
+        </div>
+
+        <!-- Visão de Alterar Senha -->
+        <div class="tab-pane fade <?php echo ($view === 'change_password') ? 'show active' : ''; ?>">
+            <?php include PROJECT_ROOT . '/src/Views/admin/change_password.php'; ?>
         </div>
     </div>
 </div>
